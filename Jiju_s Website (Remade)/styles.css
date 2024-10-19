@@ -1,0 +1,315 @@
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: #ffffff; /* Ensure visibility */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better separation */
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    width: 100%;
+}
+
+/* Ensure the top header is always visible */
+.top-header {
+    background-color: #1f2a44; /* Dark navy blue background */
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    position: relative;
+    z-index: 1000; /* Ensure it stays on top */
+}
+
+.logo-text {
+    display: flex;
+    align-items: center; /* Vertically align items */
+}
+
+.logo-text img {
+    height: 40px; /* Adjust the height to match the dropdowns */
+    margin-right: 10px; /* Add some space between the image and the text */
+}
+
+.logo span {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.user-links {
+    display: flex;
+    gap: 15px;
+}
+
+.user-links a {
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+}
+
+/* Initial state of the bottom header */
+.bottom-header {
+    background-color: #ffffff; /* Background color to ensure visibility */
+    z-index: 999; /* Ensure it stays below the top header */
+    padding: 10px 0; /* Add some padding for better appearance */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better separation */
+    transition: top 0.3s ease-in-out; /* Smooth transition */
+}
+
+/* Sticky state of the bottom header */
+.sticky .bottom-header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000; /* Ensure it stays on top of other elements */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Add a shadow for better separation */
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 20px; /* Reduce gap between dropdowns */
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    position: relative;
+}
+
+.nav-links a {
+    display: flex;
+    align-items: center; /* Vertically align items */
+    text-decoration: none;
+    color: #1f2a44; /* Dark navy blue text */
+    font-weight: bold;
+    padding: 10px;
+    transition: background-color 0.3s, color 0.3s; /* Add transition for smooth effect */
+}
+
+.nav-links li > a::after {
+    content: ' \25BC'; /* Unicode for down arrow */
+    font-size: 0.6em;
+    margin-left: 5px;
+}
+
+.dropdown a::after {
+    content: ''; /* Remove down arrow from dropdown items */
+}
+
+.dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background-color: white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s; /* Add transition for fade-in effect */
+}
+
+.dropdown li {
+    white-space: nowrap;
+}
+
+.dropdown a {
+    padding: 15px 20px;
+    display: block;
+    color: #1f2a44;
+    transition: background-color 0.3s, color 0.3s; /* Add transition for smooth effect */
+}
+
+.nav-links li:hover > a {
+    background-color: #1f2a44; /* Dark navy blue background on hover */
+    color: white; /* White text on hover */
+}
+
+.nav-links li:hover .dropdown {
+    display: block;
+    opacity: 1; /* Make dropdown visible */
+}
+
+.dropdown li:hover > a {
+    background-color: #1f2a44; /* Dark navy blue background on hover */
+    color: white; /* White text on hover */
+}
+
+/* New CSS for the logo text */
+.logo-text {
+    font-size: 1.5em; /* Increase font size */
+    font-weight: bold; /* Make text bold */
+    color: rgb(28, 0, 104); /* Text color black */
+    letter-spacing: -0.5px; /* Reduce space between letters */
+    flex-direction: column; /* Stack text vertically */
+    margin-right: 20px; /* Add margin to separate from nav */
+}
+
+/* New CSS for content section */
+.content {
+    text-align: center;
+    padding: 20px;
+}
+
+.content p {
+    font-size: 1.2em;
+    color: #1f2a44; /* Dark navy blue text */
+}
+
+.contact-button {
+    background-color: #1f2a44; /* Dark navy blue */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s; /* Add transition for smooth effect */
+    font-weight: bold;
+}
+
+.contact-button:hover {
+    background-color: white;
+    color: #1f2a44; /* Dark navy blue text */
+    border: 1px solid #1f2a44; /* Add border on hover */
+}
+
+.tiles-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px; /* Increase gap between tiles */
+    padding: 30px; /* Increase padding around the container */
+}
+
+.tile {
+    background-color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+    width: 350px; /* Increase width of the tiles */
+    transition: transform 0.3s;
+}
+
+.tile img {
+    width: 100%;
+    height: auto;
+}
+
+.tile h3 {
+    font-size: 1.7em; /* Increase font size */
+    color: #1f2a44; /* Dark navy blue text */
+    margin: 20px 0; /* Increase margin */
+    font-weight: lighter; /* Make text lighter */
+    text-align: left; /* Align text to the left */
+    padding-left: 20px; /* Add a small gap from the left edge */
+}
+
+.tile a {
+    display: inline-block;
+    margin: 20px 0; /* Increase margin */
+    color: #1f2a44; /* Dark navy blue text */
+    text-decoration: none;
+    font-weight: bold;
+    transition: color 0.3s;
+    font-size: 1.1em; /* Increase font size */
+}
+
+.tile a:hover {
+    color: #ff6600; /* Orange text on hover */
+}
+
+.tile:hover {
+    transform: translateY(-10px); /* Lift the tile on hover */
+}
+
+.banner img {
+    width: 100%;
+    height: auto;
+    display: block;
+    margin-top: 80px; /* Add margin to separate from tiles */
+}
+
+footer {
+    background-color: #0a1635;
+    padding: 40px 0;
+    text-align: center;
+}
+
+.footer-container {
+    display: flex;
+    justify-content: space-around;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-column h4 {
+    font-size: 1.2em;
+    color: #ffffff; /* White text */
+    margin-bottom: 10px;
+}
+
+.footer-column ul {
+    list-style: none;
+    font-size: 1.2em;
+    padding: 0;
+    text-align: left; /* Align text to the left */
+}
+
+.footer-column ul li::before {
+    content: "> ";
+    color: #ffffff;
+    font-size: 1.2em;
+    margin-right: 5px; /* Add margin to create gap between the bullet and the text */
+}
+
+.footer-column ul li {
+    margin: 5px 0;
+}
+
+.footer-column ul li a {
+    color: #ffffff; /* White text */
+    text-decoration: none;
+    font-size: 0.9em;
+    transition: color 0.3s; /* Add transition for smooth effect */
+}
+
+.footer-column ul li a:hover {
+    color: grey; /* Grey text on hover */
+}
+
+#back-to-top {
+    display: default; /* Hidden by default */
+    position: fixed; /* Fixed position */
+    bottom: 20px; /* 20px from the bottom */
+    right: 20px; /* 20px from the right */
+    z-index: 100; /* Ensure it is on top of other elements */
+    background-color: #1f2a44; /* Dark navy blue background */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 10px 20px; /* Some padding */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+    transition: opacity 0.3s; /* Smooth transition for visibility */
+}
+
+#back-to-top:hover {
+    background-color: #ff6600; /* Orange background on hover */
+}
