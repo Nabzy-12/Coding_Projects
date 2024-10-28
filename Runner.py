@@ -177,11 +177,12 @@ while running:
     # Display fade time bar
     fade_bar_width = 200
     fade_bar_height = 20
-    fade_bar_x = SCREEN_WIDTH - fade_bar_width - 10
+    fade_bar_x = (SCREEN_WIDTH - fade_bar_width) // 2
     fade_bar_y = 10
     fade_bar_fill_width = int(fade_bar_width * (player.fade_counter / fade_duration))
-    pygame.draw.rect(screen, BLACK, (fade_bar_x, fade_bar_y, fade_bar_width, fade_bar_height), 2)
-    pygame.draw.rect(screen, GREEN, (fade_bar_x, fade_bar_y, fade_bar_fill_width, fade_bar_height))
+    pygame.draw.rect(screen, BLACK, (fade_bar_x - 2, fade_bar_y - 2, fade_bar_width + 4, fade_bar_height + 4), 0, border_radius=12)
+    pygame.draw.rect(screen, BLACK, (fade_bar_x, fade_bar_y, fade_bar_width, fade_bar_height), 2, border_radius=10)
+    pygame.draw.rect(screen, GREEN, (fade_bar_x, fade_bar_y, fade_bar_fill_width, fade_bar_height), border_radius=10)
 
     pygame.display.flip()
 
