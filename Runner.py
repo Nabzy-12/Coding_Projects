@@ -68,9 +68,9 @@ class Player(pygame.sprite.Sprite):
                 self.fade = False
                 self.invincible = False
                 self.image.fill(PLAYER_COLOR)
-                self.fade_counter = fade_duration
         else:
-            self.fade_counter = min(fade_duration, self.fade_counter + FADE_RECHARGE_RATE)
+            if self.fade_counter < fade_duration:
+                self.fade_counter = min(fade_duration, self.fade_counter + FADE_RECHARGE_RATE)
 
 # Obstacle class
 class Obstacle(pygame.sprite.Sprite):
