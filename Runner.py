@@ -26,7 +26,8 @@ OBSTACLE_WIDTH = 50
 OBSTACLE_HEIGHT = 50
 OBSTACLE_COLOR = (255, 0, 0)
 OBSTACLE_SPEED = 5
-OBSTACLE_SPEED_INCREMENT = 0.01  # Speed increment per frame
+OBSTACLE_SPEED_INCREMENT = 1  # Speed increment per interval
+SPEED_INCREASE_INTERVAL = 150  # Interval in frames before speed can increase
 
 # Set up the display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -140,6 +141,7 @@ def show_start_menu():
 # Game loop
 running = True
 clock = pygame.time.Clock()
+frame_counter = 0  # Counter to track frames
 
 # Show start menu
 show_start_menu()
@@ -154,8 +156,11 @@ while running:
     player.update(fade_duration)
     all_sprites.update()
 
-    # Increase obstacle speed
-    OBSTACLE_SPEED += OBSTACLE_SPEED_INCREMENT
+    # Increase obstacle speed at intervals
+    frame_counter += 1
+    if frame_counter >= SPEED_INCREASE_INTERVAL:
+        OBSTACLE_SPEED += OBSTACLE_SPEED_INCREMENT
+        frame_counter = 0
 
     # Check for collisions
     if not player.invincible and pygame.sprite.spritecollideany(player, obstacles):
@@ -166,7 +171,7 @@ while running:
     all_sprites.draw(screen)
 
     # Display current speed
-    speed_text = font.render(f"Speed: {OBSTACLE_SPEED:.2f}", True, BLACK)
+    speed_text = font.render(f"Speed: {OBSTACLE_SPEED}", True, BLACK)
     screen.blit(speed_text, (10, 10))
 
     # Display fade time bar
