@@ -8,8 +8,12 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 
 # Colors
 WHITE, BLACK, GREEN = (255, 255, 255), (0, 0, 0), (0, 255, 0)
-PLAYER_COLOR, PLAYER_FADE_COLOR = (0, 128, 255), (128, 128, 128)
+PLAYER_COLOR, PLAYER_FADE_COLOR = (0, 128, 255), (0, 0, 255)  # Changed fade color to blue
 OBSTACLE_COLOR = (255, 0, 0)
+BACKGROUND_COLOR = (30, 30, 30)
+TEXT_COLOR = (255, 255, 255)
+FADE_BAR_BORDER_COLOR = (200, 200, 200)
+FADE_BAR_FILL_COLOR = (0, 255, 0)
 
 # Player settings
 PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED = 50, 50, 10
@@ -23,7 +27,7 @@ OBSTACLE_SPEED_INCREMENT, SPEED_INCREASE_INTERVAL = 1, 150
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Endless Runner")
 
-# Font for displaying speed
+# Font for displaying speed and score
 font = pygame.font.Font(None, 36)
 
 class Player(pygame.sprite.Sprite):
@@ -34,6 +38,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(x=100, y=SCREEN_HEIGHT - PLAYER_HEIGHT - 10)
         self.fade, self.invincible = False, False
         self.fade_counter = BASE_FADE_DURATION
+        self.alpha = 255
 
     def update(self, fade_duration=BASE_FADE_DURATION + OBSTACLE_SPEED * 2):
         mouse_buttons = pygame.mouse.get_pressed()
@@ -41,17 +46,17 @@ class Player(pygame.sprite.Sprite):
             self.fade, self.invincible = True, True
         elif mouse_buttons[2]:  # Right mouse button
             self.fade, self.invincible = False, False
-            self.image.fill(PLAYER_COLOR)
 
         if self.fade:
-            alpha = max(0, 255 * (self.fade_counter / fade_duration))
-            self.image.fill((*PLAYER_FADE_COLOR[:3], int(alpha)))
+            self.alpha = max(0, 255 * (self.fade_counter / fade_duration))
             self.fade_counter -= 1
             if self.fade_counter <= 0:
                 self.fade, self.invincible = False, False
-                self.image.fill(PLAYER_COLOR)
         else:
             self.fade_counter = min(fade_duration, self.fade_counter + FADE_RECHARGE_RATE)
+            self.alpha = min(255, 255 * (self.fade_counter / fade_duration))
+
+        self.image.fill((*PLAYER_FADE_COLOR[:3], int(self.alpha)) if self.fade else (*PLAYER_COLOR[:3], int(self.alpha)))
 
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self):
@@ -96,9 +101,9 @@ def show_start_menu():
             if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 start_menu = False
 
-        screen.fill(WHITE)
-        title_text = font.render("Endless Runner", True, BLACK)
-        instruction_text = font.render("Press Enter to Start", True, BLACK)
+        screen.fill(BACKGROUND_COLOR)
+        title_text = font.render("Endless Runner", True, TEXT_COLOR)
+        instruction_text = font.render("Press Enter to Start", True, TEXT_COLOR)
         screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
         screen.blit(instruction_text, (SCREEN_WIDTH // 2 - instruction_text.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
         pygame.display.flip()
@@ -123,20 +128,47 @@ while running:
     if not player.invincible and pygame.sprite.spritecollideany(player, obstacles):
         running = False
 
-    screen.fill(WHITE)
+    screen.fill(BACKGROUND_COLOR)
     all_sprites.draw(screen)
 
-    speed_text = font.render(f"Speed: {OBSTACLE_SPEED}", True, BLACK)
+    speed_text = font.render(f"Speed: {OBSTACLE_SPEED}", True, TEXT_COLOR)
     screen.blit(speed_text, (10, 10))
+
+    # Calculate and display the score
+    score = frame_counter // 60  # Assuming 60 FPS, score is in seconds
+    score_text = font.render(f"Score: {score}", True, TEXT_COLOR)
+    screen.blit(score_text, (10, 50))
 
     fade_bar_width, fade_bar_height = 200, 20
     fade_bar_x, fade_bar_y = (SCREEN_WIDTH - fade_bar_width) // 2, 10
-    fade_bar_fill_width = int(fade_bar_width * (player.fade_counter / (BASE_FADE_DURATION + OBSTACLE_SPEED * 2)))
-    pygame.draw.rect(screen, BLACK, (fade_bar_x - 2, fade_bar_y - 2, fade_bar_width + 4, fade_bar_height + 4), 0, border_radius=12)
-    pygame.draw.rect(screen, BLACK, (fade_bar_x, fade_bar_y, fade_bar_width, fade_bar_height), 2, border_radius=10)
-    pygame.draw.rect(screen, GREEN, (fade_bar_x, fade_bar_y, fade_bar_fill_width, fade_bar_height), border_radius=10)
+    fade_bar_fill_width = min(fade_bar_width, int(fade_bar_width * (player.fade_counter / (BASE_FADE_DURATION + OBSTACLE_SPEED * 2))))
+    pygame.draw.rect(screen, FADE_BAR_BORDER_COLOR, (fade_bar_x - 2, fade_bar_y - 2, fade_bar_width + 4, fade_bar_height + 4), 0, border_radius=12)
+    pygame.draw.rect(screen, FADE_BAR_BORDER_COLOR, (fade_bar_x, fade_bar_y, fade_bar_width, fade_bar_height), 2, border_radius=10)
+    pygame.draw.rect(screen, FADE_BAR_FILL_COLOR, (fade_bar_x, fade_bar_y, fade_bar_fill_width, fade_bar_height), border_radius=10)
 
     pygame.display.flip()
     clock.tick(60)
 
+# Display the final score
+def show_final_score(score):
+    final_score_screen = True
+    while final_score_screen:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                final_score_screen = False
+
+        screen.fill(BACKGROUND_COLOR)
+        score_text = font.render(f"Final Score: {score}", True, TEXT_COLOR)
+        instruction_text = font.render("Press Enter to Exit", True, TEXT_COLOR)
+        screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, SCREEN_HEIGHT // 2 - 50))
+        screen.blit(instruction_text, (SCREEN_WIDTH // 2 - instruction_text.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
+        pygame.display.flip()
+
+# Calculate the score based on the time survived
+score = frame_counter // 60  # Assuming 60 FPS, score is in seconds
+
+show_final_score(score)
 pygame.quit()
