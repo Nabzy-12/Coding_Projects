@@ -108,7 +108,7 @@ def show_start_menu():
         screen.blit(instruction_text, (SCREEN_WIDTH // 2 - instruction_text.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
         pygame.display.flip()
 
-running, clock, frame_counter = True, pygame.time.Clock(), 0
+running, clock, frame_counter, score = True, pygame.time.Clock(), 0, 0
 
 show_start_menu()
 
@@ -121,6 +121,7 @@ while running:
     all_sprites.update()
 
     frame_counter += 1
+    score += 1  # Increment score every frame
     if frame_counter >= SPEED_INCREASE_INTERVAL:
         OBSTACLE_SPEED += OBSTACLE_SPEED_INCREMENT
         frame_counter = 0
@@ -133,10 +134,8 @@ while running:
 
     speed_text = font.render(f"Speed: {OBSTACLE_SPEED}", True, TEXT_COLOR)
     screen.blit(speed_text, (10, 10))
-
-    # Calculate and display the score
-    score = frame_counter // 60  # Assuming 60 FPS, score is in seconds
-    score_text = font.render(f"Score: {score}", True, TEXT_COLOR)
+    # Display the score
+    score_text = font.render(f"Score: {score // 60}", True, TEXT_COLOR)  # Assuming 60 FPS, score is in seconds
     screen.blit(score_text, (10, 50))
 
     fade_bar_width, fade_bar_height = 200, 20
@@ -167,8 +166,5 @@ def show_final_score(score):
         screen.blit(instruction_text, (SCREEN_WIDTH // 2 - instruction_text.get_width() // 2, SCREEN_HEIGHT // 2 + 10))
         pygame.display.flip()
 
-# Calculate the score based on the time survived
-score = frame_counter // 60  # Assuming 60 FPS, score is in seconds
-
-show_final_score(score)
+show_final_score(score // 60)  # Convert score to seconds
 pygame.quit()
