@@ -37,7 +37,7 @@ PLAYER_JUMP_HEIGHT = 12  # Increased jump height to clear two obstacles
 GRAVITY = 0.4  # Further reduced gravity for smoother fall
 MAX_JUMPS = 2  # Allow two jumps
 
-BACKGROUND_IMAGE = pygame.image.load('background.png').convert()
+BACKGROUND_IMAGE = pygame.image.load('Runner game/background.png').convert()
 BACKGROUND_IMAGE = pygame.transform.scale(BACKGROUND_IMAGE, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 class Player(pygame.sprite.Sprite):
