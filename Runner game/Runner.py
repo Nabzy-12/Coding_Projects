@@ -102,7 +102,7 @@ class Player(pygame.sprite.Sprite):
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self, x):
         super().__init__()
-        self.image = pygame.image.load('sprite_folder/new_obstacle.png').convert_alpha()  # Updated sprite
+        self.image = pygame.image.load('obstacle.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (OBSTACLE_WIDTH, OBSTACLE_HEIGHT))
         self.rect = self.image.get_rect(x=x, y=SCREEN_HEIGHT - OBSTACLE_HEIGHT - 10)
         self.mask = pygame.mask.from_surface(self.image)
@@ -113,7 +113,7 @@ class Obstacle(pygame.sprite.Sprite):
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x):
         super().__init__()
-        self.image = pygame.image.load('sprite_folder/new_wall.png').convert_alpha()  # Updated sprite
+        self.image = pygame.image.load('wall.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (OBSTACLE_WIDTH, WALL_HEIGHT))
         self.rect = self.image.get_rect(x=x, y=SCREEN_HEIGHT - WALL_HEIGHT - 10)
         self.mask = pygame.mask.from_surface(self.image)
@@ -124,7 +124,7 @@ class Wall(pygame.sprite.Sprite):
 class Pit(pygame.sprite.Sprite):
     def __init__(self, x):
         super().__init__()
-        self.image = pygame.image.load('sprite_folder/new_pit.png').convert_alpha()  # Updated sprite
+        self.image = pygame.image.load('pit.png').convert_alpha()
         self.image = pygame.transform.scale(self.image, (PIT_WIDTH, 10))
         self.rect = self.image.get_rect(x=x, y=SCREEN_HEIGHT - 10)
         self.mask = pygame.mask.from_surface(self.image)
