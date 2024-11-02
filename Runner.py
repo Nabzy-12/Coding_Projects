@@ -9,7 +9,7 @@ SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
 
 # Colors
 WHITE, BLACK, GREEN = (255, 255, 255), (0, 0, 0), (0, 255, 0)
-PLAYER_COLOR, PLAYER_FADE_COLOR = (0, 128, 255), (0, 0, 255)  # Changed fade color to blue
+PLAYER_COLOR, PLAYER_INVISIBLE_COLOR = (0, 128, 255), (0, 0, 255)  # Changed fade color to blue
 OBSTACLE_COLOR = (255, 0, 0)
 BACKGROUND_COLOR = (30, 30, 30)
 TEXT_COLOR = (255, 255, 255)
@@ -18,11 +18,12 @@ FADE_BAR_FILL_COLOR = (0, 255, 0)
 
 # Player settings
 PLAYER_WIDTH, PLAYER_HEIGHT, PLAYER_SPEED, PLAYER_JUMP_SPEED = 50, 50, 10, 2  # Reduced jump speed for more realistic motion
-BASE_FADE_DURATION, FADE_RECHARGE_RATE = 150, 5
+BASE_INVISIBLE_DURATION, INVISIBLE_RECHARGE_RATE = 150, 5
 
 # Obstacle settings
 OBSTACLE_WIDTH, OBSTACLE_HEIGHT, OBSTACLE_SPEED = 50, 50, 5
 WALL_HEIGHT = SCREEN_HEIGHT - 450  # Make walls tall enough so the player can't jump over them
+PIT_WIDTH = 100  # Width of the pit
 
 # Set up the display
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -36,15 +37,18 @@ PLAYER_JUMP_HEIGHT = 12  # Increased jump height to clear two obstacles
 GRAVITY = 0.4  # Further reduced gravity for smoother fall
 MAX_JUMPS = 2  # Allow two jumps
 
+BACKGROUND_IMAGE = pygame.image.load('background.png').convert()
+BACKGROUND_IMAGE = pygame.transform.scale(BACKGROUND_IMAGE, (SCREEN_WIDTH, SCREEN_HEIGHT))
+
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface((PLAYER_WIDTH, PLAYER_HEIGHT), pygame.SRCALPHA)
-        self.image.fill(PLAYER_COLOR)
+        self.image = pygame.image.load('player.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (PLAYER_WIDTH, PLAYER_HEIGHT))
         self.rect = self.image.get_rect(x=100, y=SCREEN_HEIGHT - PLAYER_HEIGHT - 10)
         self.mask = pygame.mask.from_surface(self.image)
-        self.fade, self.invincible = False, False
-        self.fade_counter = BASE_FADE_DURATION
+        self.invisible, self.invincible = False, False
+        self.invisible_counter = BASE_INVISIBLE_DURATION
         self.alpha = 255
         self.is_jumping = False
         self.jump_speed = 0
@@ -56,23 +60,23 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         mouse_buttons = pygame.mouse.get_pressed()
         if mouse_buttons[0]:  # Left mouse button
-            self.fade, self.invincible = True, True
+            self.invisible, self.invincible = True, True
         elif mouse_buttons[2]:  # Right mouse button
-            self.fade, self.invincible = False, False
+            self.invisible, self.invincible = False, False
 
-        if self.fade:
-            self.alpha = max(0, 255 * (self.fade_counter / BASE_FADE_DURATION))
-            self.fade_counter -= 1
-            if self.fade_counter <= 0:
-                self.fade, self.invincible = False, False
+        if self.invisible:
+            self.alpha = max(0, 255 * (self.invisible_counter / BASE_INVISIBLE_DURATION))
+            self.invisible_counter -= 1
+            if self.invisible_counter <= 0:
+                self.invisible, self.invincible = False, False
         else:
-            self.fade_counter = min(BASE_FADE_DURATION, self.fade_counter + FADE_RECHARGE_RATE)
-            self.alpha = min(255, 255 * (self.fade_counter / BASE_FADE_DURATION))
+            self.invisible_counter = min(BASE_INVISIBLE_DURATION, self.invisible_counter + INVISIBLE_RECHARGE_RATE)
+            self.alpha = min(255, 255 * (self.invisible_counter / BASE_INVISIBLE_DURATION))
 
-        self.image.fill((*PLAYER_FADE_COLOR[:3], int(self.alpha)) if self.fade else (*PLAYER_COLOR[:3], int(self.alpha)))
+        self.image.set_alpha(self.alpha)
 
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE] and self.on_ground:
+        if keys[pygame.K_SPACE] and self.on_ground and not self.invisible:
             self.is_jumping = True
             self.jump_speed = -PLAYER_JUMP_HEIGHT
             self.on_ground = False
@@ -89,17 +93,17 @@ class Player(pygame.sprite.Sprite):
                 self.angle = 0  # Reset angle when on the ground
 
         # Rotate the player image
-        original_image = pygame.Surface((PLAYER_WIDTH, PLAYER_HEIGHT), pygame.SRCALPHA)
-        original_image.fill((*PLAYER_FADE_COLOR[:3], int(self.alpha)) if self.fade else (*PLAYER_COLOR[:3], int(self.alpha)))
-        self.image = pygame.transform.rotate(original_image, self.angle)
+        self.image = pygame.transform.rotate(pygame.image.load('player.png').convert_alpha(), self.angle)
+        self.image = pygame.transform.scale(self.image, (PLAYER_WIDTH, PLAYER_HEIGHT))
+        self.image.set_alpha(self.alpha)
         self.rect = self.image.get_rect(center=self.rect.center)
         self.mask = pygame.mask.from_surface(self.image)
 
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self, x):
         super().__init__()
-        self.image = pygame.Surface((OBSTACLE_WIDTH, OBSTACLE_HEIGHT))
-        self.image.fill(OBSTACLE_COLOR)
+        self.image = pygame.image.load('obstacle.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (OBSTACLE_WIDTH, OBSTACLE_HEIGHT))
         self.rect = self.image.get_rect(x=x, y=SCREEN_HEIGHT - OBSTACLE_HEIGHT - 10)
         self.mask = pygame.mask.from_surface(self.image)
 
@@ -109,9 +113,20 @@ class Obstacle(pygame.sprite.Sprite):
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x):
         super().__init__()
-        self.image = pygame.Surface((OBSTACLE_WIDTH, WALL_HEIGHT))
-        self.image.fill(OBSTACLE_COLOR)
+        self.image = pygame.image.load('wall.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (OBSTACLE_WIDTH, WALL_HEIGHT))
         self.rect = self.image.get_rect(x=x, y=SCREEN_HEIGHT - WALL_HEIGHT - 10)
+        self.mask = pygame.mask.from_surface(self.image)
+
+    def update(self):
+        self.rect.x -= OBSTACLE_SPEED
+
+class Pit(pygame.sprite.Sprite):
+    def __init__(self, x):
+        super().__init__()
+        self.image = pygame.image.load('pit.png').convert_alpha()
+        self.image = pygame.transform.scale(self.image, (PIT_WIDTH, 10))
+        self.rect = self.image.get_rect(x=x, y=SCREEN_HEIGHT - 10)
         self.mask = pygame.mask.from_surface(self.image)
 
     def update(self):
@@ -124,13 +139,16 @@ player = Player()
 all_sprites.add(player)
 
 def generate_obstacle(player_x):
-    obstacle_type = random.choice(['obstacle', 'wall'])
+    obstacle_type = random.choice(['obstacle', 'wall', 'pit'])
     if obstacle_type == 'obstacle':
         obstacle_x = player_x + SCREEN_WIDTH + random.randint(100, 300)
         obstacle = Obstacle(obstacle_x)
-    else:
+    elif obstacle_type == 'wall':
         obstacle_x = player_x + SCREEN_WIDTH + random.randint(100, 300)
         obstacle = Wall(obstacle_x)
+    else:
+        obstacle_x = player_x + SCREEN_WIDTH + random.randint(100, 300)
+        obstacle = Pit(obstacle_x)
     obstacles.add(obstacle)
     all_sprites.add(obstacle)
 
@@ -167,7 +185,7 @@ def show_keybinds():
 
         screen.fill(BACKGROUND_COLOR)
         title_text = font.render("Keybinds", True, TEXT_COLOR)
-        fade_text = font.render("Left Mouse Button: Fade", True, TEXT_COLOR)
+        fade_text = font.render("Left Mouse Button: Invisible", True, TEXT_COLOR)
         jump_text = font.render("Space: Jump", True, TEXT_COLOR)
         start_text = font.render("Press Enter to Continue", True, TEXT_COLOR)
         screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, SCREEN_HEIGHT // 2 - 100))
@@ -182,6 +200,7 @@ show_start_menu()
 show_keybinds()
 
 camera_x = 0  # Initialize camera position
+background_x = 0  # Initialize background position
 
 while running:
     for event in pygame.event.get():
@@ -196,6 +215,9 @@ while running:
     if not player.invincible and pygame.sprite.spritecollide(player, obstacles, False, pygame.sprite.collide_mask):
         running = False
 
+    if pygame.sprite.spritecollide(player, [pit for pit in obstacles if isinstance(pit, Pit)], False, pygame.sprite.collide_mask):
+        running = False
+
     camera_x = player.rect.x - 100  # Update camera position to follow the player
 
     # Remove obstacles that are far behind the player
@@ -207,7 +229,14 @@ while running:
     if len(obstacles) < 5:
         generate_obstacle(player.rect.x)
 
-    screen.fill(BACKGROUND_COLOR)
+    # Scroll the background
+    background_x -= 5
+    if background_x <= -SCREEN_WIDTH:
+        background_x = 0
+
+    screen.blit(BACKGROUND_IMAGE, (background_x, 0))
+    screen.blit(BACKGROUND_IMAGE, (background_x + SCREEN_WIDTH, 0))
+
     for sprite in all_sprites:
         screen.blit(sprite.image, (sprite.rect.x - camera_x, sprite.rect.y))
 
@@ -217,7 +246,7 @@ while running:
 
     fade_bar_width, fade_bar_height = 200, 20
     fade_bar_x, fade_bar_y = (SCREEN_WIDTH - fade_bar_width) // 2, 10
-    fade_bar_fill_width = min(fade_bar_width, int(fade_bar_width * (player.fade_counter / BASE_FADE_DURATION)))
+    fade_bar_fill_width = min(fade_bar_width, int(fade_bar_width * (player.invisible_counter / BASE_INVISIBLE_DURATION)))
     pygame.draw.rect(screen, FADE_BAR_BORDER_COLOR, (fade_bar_x - 2, fade_bar_y - 2, fade_bar_width + 4, fade_bar_height + 4), 0, border_radius=12)
     pygame.draw.rect(screen, FADE_BAR_BORDER_COLOR, (fade_bar_x, fade_bar_y, fade_bar_width, fade_bar_height), 2, border_radius=10)
     pygame.draw.rect(screen, FADE_BAR_FILL_COLOR, (fade_bar_x, fade_bar_y, fade_bar_fill_width, fade_bar_height), border_radius=10)
