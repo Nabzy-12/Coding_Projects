@@ -1,8 +1,12 @@
 import pygame
 import random
+import os
 
 # Initialize Pygame
 pygame.init()
+
+# Get the absolute path of the script's directory
+script_dir = os.path.dirname(os.path.abspath(__file__))
 
 # Screen dimensions
 SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
@@ -37,13 +41,21 @@ PLAYER_JUMP_HEIGHT = 12  # Increased jump height to clear two obstacles
 GRAVITY = 0.4  # Further reduced gravity for smoother fall
 MAX_JUMPS = 2  # Allow two jumps
 
+<<<<<<< Updated upstream
 BACKGROUND_IMAGE = pygame.image.load('Runner game/background').convert()
+=======
+BACKGROUND_IMAGE = pygame.image.load(os.path.join(script_dir, 'background.jpg')).convert()
+>>>>>>> Stashed changes
 BACKGROUND_IMAGE = pygame.transform.scale(BACKGROUND_IMAGE, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
+<<<<<<< Updated upstream
         self.image = pygame.image.load('player').convert_alpha()
+=======
+        self.image = pygame.image.load(os.path.join(script_dir, 'player.jpg')).convert_alpha()
+>>>>>>> Stashed changes
         self.image = pygame.transform.scale(self.image, (PLAYER_WIDTH, PLAYER_HEIGHT))
         self.rect = self.image.get_rect(x=100, y=SCREEN_HEIGHT - PLAYER_HEIGHT - 10)
         self.mask = pygame.mask.from_surface(self.image)
@@ -93,7 +105,11 @@ class Player(pygame.sprite.Sprite):
                 self.angle = 0  # Reset angle when on the ground
 
         # Rotate the player image
+<<<<<<< Updated upstream
         self.image = pygame.transform.rotate(pygame.image.load('player').convert_alpha(), self.angle)
+=======
+        self.image = pygame.transform.rotate(pygame.image.load(os.path.join(script_dir, 'assets/player.jpg')).convert_alpha(), self.angle)
+>>>>>>> Stashed changes
         self.image = pygame.transform.scale(self.image, (PLAYER_WIDTH, PLAYER_HEIGHT))
         self.image.set_alpha(self.alpha)
         self.rect = self.image.get_rect(center=self.rect.center)
@@ -102,7 +118,11 @@ class Player(pygame.sprite.Sprite):
 class Obstacle(pygame.sprite.Sprite):
     def __init__(self, x):
         super().__init__()
+<<<<<<< Updated upstream
         self.image = pygame.image.load('sprite_folder/new_obstacle').convert_alpha()  # Updated sprite
+=======
+        self.image = pygame.image.load(os.path.join(script_dir, 'new_obstacle.jpg')).convert_alpha()  # Updated sprite
+>>>>>>> Stashed changes
         self.image = pygame.transform.scale(self.image, (OBSTACLE_WIDTH, OBSTACLE_HEIGHT))
         self.rect = self.image.get_rect(x=x, y=SCREEN_HEIGHT - OBSTACLE_HEIGHT - 10)
         self.mask = pygame.mask.from_surface(self.image)
@@ -113,7 +133,11 @@ class Obstacle(pygame.sprite.Sprite):
 class Wall(pygame.sprite.Sprite):
     def __init__(self, x):
         super().__init__()
+<<<<<<< Updated upstream
         self.image = pygame.image.load('sprite_folder/new_wall').convert_alpha()  # Updated sprite
+=======
+        self.image = pygame.image.load(os.path.join(script_dir, 'new_wall.jpg')).convert_alpha()  # Updated sprite
+>>>>>>> Stashed changes
         self.image = pygame.transform.scale(self.image, (OBSTACLE_WIDTH, WALL_HEIGHT))
         self.rect = self.image.get_rect(x=x, y=SCREEN_HEIGHT - WALL_HEIGHT - 10)
         self.mask = pygame.mask.from_surface(self.image)
@@ -124,7 +148,11 @@ class Wall(pygame.sprite.Sprite):
 class Pit(pygame.sprite.Sprite):
     def __init__(self, x):
         super().__init__()
+<<<<<<< Updated upstream
         self.image = pygame.image.load('sprite_folder/new_pit').convert_alpha()  # Updated sprite
+=======
+        self.image = pygame.image.load(os.path.join(script_dir, 'new_pit.jpg')).convert_alpha()  # Updated sprite
+>>>>>>> Stashed changes
         self.image = pygame.transform.scale(self.image, (PIT_WIDTH, 10))
         self.rect = self.image.get_rect(x=x, y=SCREEN_HEIGHT - 10)
         self.mask = pygame.mask.from_surface(self.image)
